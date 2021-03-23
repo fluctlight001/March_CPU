@@ -85,7 +85,7 @@ module cache_sample(
         if (rst == `RstEnable) begin
             ram_valid_way0 <= 16'h0;
         end
-        else if (wen_fill == `True_v) begin
+        else if (wen_fill == `True_v && lru[index_i] == 1'b1) begin
             ram_valid_way0[index_i] <= 1'b1;
         end
     end
@@ -190,9 +190,9 @@ module cache_sample(
     // way1 valid
     always @ (posedge clk) begin
         if(rst == `RstEnable) begin
-            ram_valid_way1 <= 16'hffff;
+            ram_valid_way1 <= 16'h0;
         end
-        else if (wen_fill == `True_v) begin
+        else if (wen_fill == `True_v && lru[index_i] == 1'b0) begin
             ram_valid_way1[index_i] <= 1'b1;
         end
     end
@@ -365,12 +365,12 @@ module cache_sample(
         end
         else if (miss_next == `True_v && lru[index_i] == 1'b0) begin
             wen_back <= `True_v;
-            waddr <= {ram_tag_way1[index_i],10'b0};
+            waddr <= {ram_tag_way1[index_i],index_i,6'b0};
             wback <= ram_data_way1[index_i];
         end
         else if (miss_next == `True_v && lru[index_i] == 1'b1) begin
             wen_back <= `True_v;
-            waddr <= {ram_tag_way0[index_i],10'b0};
+            waddr <= {ram_tag_way0[index_i],index_i,6'b0};
             wback <= ram_data_way0[index_i];
         end
         else begin

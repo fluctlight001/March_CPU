@@ -148,38 +148,64 @@ module mycpu_top(
     wire dcache_raccept;
 
     wire dcache_wen_fill;
-    wire [511:0] dcache_wfill;
+    wire [255:0] dcache_wfill;
     
     wire dcache_wen;
     wire [31:0] dcache_waddr;
-    wire [511:0] dcache_wdata;
+    wire [255:0] dcache_wdata;
     wire dcache_wfin;
 
-    cache_sample u_dcache(
-    	.clk       (aclk       ),
-        .rst       (!aresetn       ),
-        // mycpu_core
-        .en        (data_sram_en & data_cache_sel        ),
-        .wen       (data_sram_wen       ),
-        .addr      (data_sram_addr_mmu  ),
-        .wdata     (data_sram_wdata     ),
-        .rdata     (data_sram_rdata_cache     ),
+    // cache_sample u_dcache(
+    // 	.clk       (aclk       ),
+    //     .rst       (!aresetn       ),
+    //     // mycpu_core
+    //     .en        (data_sram_en & data_cache_sel        ),
+    //     .wen       (data_sram_wen       ),
+    //     .addr      (data_sram_addr_mmu  ),
+    //     .wdata     (data_sram_wdata     ),
+    //     .rdata     (data_sram_rdata_cache     ),
 
-        // dcache_interface
-        .wen_back  (dcache_wen  ),
-        .waddr     (dcache_waddr     ),
-        .wback     (dcache_wdata     ),
-        .fin       (dcache_wfin       ),
+    //     // dcache_interface
+    //     .wen_back  (dcache_wen  ),
+    //     .waddr     (dcache_waddr     ),
+    //     .wback     (dcache_wdata     ),
+    //     .fin       (dcache_wfin       ),
 
-        .wen_fill  (dcache_wen_fill  ),
-        .wfill     (dcache_wfill     ),
+    //     .wen_fill  (dcache_wen_fill  ),
+    //     .wfill     (dcache_wfill     ),
 
-        .miss      (dcache_ren      ),
-        .miss_addr (dcache_raddr ),
-        .accept    (dcache_raccept    ),
+    //     .miss      (dcache_ren      ),
+    //     .miss_addr (dcache_raddr ),
+    //     .accept    (dcache_raccept    ),
 
-        .stallreq  (stallreq_from_dcache  )
+    //     .stallreq  (stallreq_from_dcache  )
+    // );
+
+    cache_v2 u_dcache(
+    	.clk        (aclk        ),
+        .rst        (!aresetn        ),
+
+        .sram_en    (data_sram_en & data_cache_sel    ),
+        .sram_wen   (data_sram_wen   ),
+        .sram_addr  (data_sram_addr_mmu  ),
+        .sram_wdata (data_sram_wdata ),
+        .sram_rdata (data_sram_rdata_cache ),
+
+        .ren        (dcache_ren        ),
+        .raddr      (dcache_raddr      ),
+        .raccept    (dcache_raccept    ),
+
+        .wen_fill   (dcache_wen_fill   ),
+        .wfill      (dcache_wfill      ),
+
+        .wen        (dcache_wen        ),
+        .waddr      (dcache_waddr      ),
+        .wdata      (dcache_wdata      ),
+        .wfin       (dcache_wfin       ),
+
+        .stallreq   (stallreq_from_dcache   )
     );
+    
 
     wire dcache_sram_en;
     wire [3:0] dcache_sram_wen;
@@ -217,40 +243,64 @@ module mycpu_top(
     wire icache_raccept;
 
     wire icache_wen_fill;
-    wire [511:0] icache_wfill;
+    wire [255:0] icache_wfill;
     
     wire icache_wen;
     wire [31:0] icache_waddr;
-    wire [511:0] icache_wdata;
+    wire [255:0] icache_wdata;
     wire icache_wfin;
 
-    cache_sample u_icache(
-    	.clk       (aclk      ),
-        .rst       (!aresetn  ),
-        // mycpu_core
-        .en        (inst_sram_en        ),
-        .wen       (inst_sram_wen       ),
-        .addr      (inst_sram_addr      ),
-        .wdata     (inst_sram_wdata     ),
-        .rdata     (inst_sram_rdata     ),
+    // cache_sample u_icache(
+    // 	.clk       (aclk      ),
+    //     .rst       (!aresetn  ),
+    //     // mycpu_core
+    //     .en        (inst_sram_en        ),
+    //     .wen       (inst_sram_wen       ),
+    //     .addr      (inst_sram_addr      ),
+    //     .wdata     (inst_sram_wdata     ),
+    //     .rdata     (inst_sram_rdata     ),
         
-        // icache_interface
-        .wen_back  (icache_wen  ),
-        .waddr     (icache_waddr     ),
-        .wback     (icache_wdata     ),
-        .fin       (icache_wfin       ),
+    //     // icache_interface
+    //     .wen_back  (icache_wen  ),
+    //     .waddr     (icache_waddr     ),
+    //     .wback     (icache_wdata     ),
+    //     .fin       (icache_wfin       ),
 
-        .wen_fill  (icache_wen_fill  ),
-        .wfill     (icache_wfill     ),
+    //     .wen_fill  (icache_wen_fill  ),
+    //     .wfill     (icache_wfill     ),
 
-        .miss      (icache_ren      ),
-        .miss_addr (icache_raddr ),
-        .accept    (icache_raccept    ),
+    //     .miss      (icache_ren      ),
+    //     .miss_addr (icache_raddr ),
+    //     .accept    (icache_raccept    ),
         
-        // to cpu
-        .stallreq  (stallreq_from_icache  )
+    //     // to cpu
+    //     .stallreq  (stallreq_from_icache  )
+    // );
+
+    cache_v2 u_icache(
+    	.clk        (aclk        ),
+        .rst        (!aresetn        ),
+        .sram_en    (inst_sram_en    ),
+        .sram_wen   (inst_sram_wen   ),
+        .sram_addr  (inst_sram_addr  ),
+        .sram_wdata (inst_sram_wdata ),
+        .sram_rdata (inst_sram_rdata ),
+
+        .ren        (icache_ren        ),
+        .raddr      (icache_raddr      ),
+        .raccept    (icache_raccept    ),
+
+        .wen_fill   (icache_wen_fill   ),
+        .wfill      (icache_wfill      ),
+
+        .wen        (icache_wen        ),
+        .waddr      (icache_waddr      ),
+        .wdata      (icache_wdata      ),
+        .wfin       (icache_wfin       ),
+
+        .stallreq   (stallreq_from_icache   )
     );
-
+    
     wire icache_sram_en;
     wire [3:0] icache_sram_wen;
     wire [31:0] icache_sram_addr;
@@ -269,7 +319,7 @@ module mycpu_top(
         .wen_fill    (icache_wen_fill    ),
         .wfill       (icache_wfill       ),
 
-        .wen         (icache_wen         ),
+        .wen         (1'b0        ),
         .waddr       (icache_waddr       ),
         .wdata       (icache_wdata       ),
         .wfin        (icache_wfin        ),

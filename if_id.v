@@ -40,7 +40,7 @@ module if_id(
     else if (stall[2] == `NoStop) begin
       if (flag == `True_v) begin
         id_pc <= pc;
-        id_inst <= inst;
+        id_inst <= pc == 32'b0 ? 32'b0 : inst;
         id_excepttype <= icache_excepttype;
         flag <= `False_v;
       end

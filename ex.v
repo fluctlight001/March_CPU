@@ -171,142 +171,11 @@ module ex(
     end
   end
 
-// result_mul
-  // always @ (*) begin
-  //   if(rst == `RstEnable) begin
-  //     opdata1_mult <= `ZeroWord;
-  //     opdata2_mult <= `ZeroWord;
-  //   end 
-  //   else begin
-  //     case (aluop_i)
-  //       `MULT:begin
-  //         if(reg1_i[31] == 1'b1)  begin
-  //           opdata1_mult <= (~reg1_i + 1);
-  //         end
-  //         else begin
-  //           opdata1_mult <= reg1_i;
-  //         end
-  //         if(reg2_i[31] == 1'b1) begin
-  //           opdata2_mult <= (~reg2_i + 1);
-  //         end
-  //         else begin
-  //           opdata2_mult <= reg2_i;
-  //         end
-  //       end
-  //       `MULTU:begin
-  //         opdata1_mult <= reg1_i;
-  //         opdata2_mult <= reg2_i;
-  //       end
-  //       default :begin
-  //         opdata1_mult <= `ZeroWord;
-  //         opdata2_mult <= `ZeroWord;
-  //       end
-  //     endcase
-  //   end
-  // end
-  // always @ (*) begin
-  //   if (rst == `RstEnable) begin
-  //     result_mul <= {`ZeroWord,`ZeroWord};
-  //   end
-  //   else begin
-  //     case (aluop_i)
-  //       `MULT:begin
-  //         case({reg1_i[31],reg2_i[31]})
-  //           2'b01:begin
-  //             result_mul <= ~(opdata1_mult * opdata2_mult) + 1;
-  //           end
-  //           2'b10:begin
-  //             result_mul <= ~(opdata1_mult * opdata2_mult) + 1;
-  //           end
-  //           2'b11:begin
-  //             result_mul <= opdata1_mult * opdata2_mult;
-  //           end
-  //           2'b00:begin
-  //             result_mul <= opdata1_mult * opdata2_mult;
-  //           end
-  //         endcase
-  //       end
-  //       `MULTU:begin
-  //         result_mul <= opdata1_mult * opdata2_mult;
-  //       end
-  //       default :begin
-  //         result_mul <= {`ZeroWord,`ZeroWord};
-  //       end
-  //     endcase
-  //   end
-  // end
-  // always @ (*) begin
-  //   if (rst == `RstEnable) begin
-  //     stallreq_for_mul <= `NoStop;
-  //     mul_opdata1_o <= `ZeroWord;
-  //     mul_opdata2_o <= `ZeroWord;
-  //     mul_start_o <= `False_v;
-  //     signed_mul_o <= 1'b0;
-  //   end
-  //   else begin
-  //     stallreq_for_mul <= `NoStop;
-  //     mul_opdata1_o <= `ZeroWord;
-  //     mul_opdata2_o <= `ZeroWord;
-  //     mul_start_o <= `False_v;
-  //     signed_mul_o <= 1'b0;
-  //     case (aluop_i)
-  //       `MULT:begin
-  //         if (result_is_ok == `False_v) begin
-  //           mul_opdata1_o <= reg1_i;
-  //           mul_opdata2_o <= reg2_i;
-  //           mul_start_o <= `True_v;
-  //           signed_mul_o <= 1'b1;
-  //           stallreq_for_mul <= `Stop;
-  //         end
-  //         else if (result_is_ok == `True_v) begin
-  //           mul_opdata1_o <= reg1_i;
-  //           mul_opdata2_o <= reg2_i;
-  //           mul_start_o <= `False_v;
-  //           signed_mul_o <= 1'b1;
-  //           stallreq_for_mul <= `NoStop;
-  //         end
-  //         else begin
-  //           stallreq_for_mul <= `NoStop;
-  //           mul_opdata1_o <= `ZeroWord;
-  //           mul_opdata2_o <= `ZeroWord;
-  //           mul_start_o <= `False_v;
-  //           signed_mul_o <= 1'b0;
-  //         end
-  //       end
-  //       `MULTU:begin
-  //         if (result_is_ok == `False_v) begin
-  //           mul_opdata1_o <= reg1_i;
-  //           mul_opdata2_o <= reg2_i;
-  //           mul_start_o <= `True_v;
-  //           signed_mul_o <= 1'b0;
-  //           stallreq_for_mul <= `Stop;
-  //         end
-  //         else if (result_is_ok == `True_v) begin
-  //           mul_opdata1_o <= reg1_i;
-  //           mul_opdata2_o <= reg2_i;
-  //           mul_start_o <= `False_v;
-  //           signed_mul_o <= 1'b1;
-  //           stallreq_for_mul <= `NoStop;
-  //         end
-  //         else begin
-  //           stallreq_for_mul <= `NoStop;
-  //           mul_opdata1_o <= `ZeroWord;
-  //           mul_opdata2_o <= `ZeroWord;
-  //           mul_start_o <= `False_v;
-  //           signed_mul_o <= 1'b0;
-  //         end
-  //       end
-  //       default:begin
-          
-  //       end
-  //     endcase
-  //   end
-  // end
-  assign opdata1_mult = reg1_i; 
-  assign opdata2_mult = reg2_i;
+  // assign opdata1_mult = reg1_i; 
+  // assign opdata2_mult = reg2_i;
 
-  // assign opdata1_mult = ((aluop_i == `MULT) && (reg1_i[31] == 1'b1)) ? (~reg1_i + 1) : reg1_i;
-  // assign opdata2_mult = ((aluop_i == `MULT) && (reg2_i[31] == 1'b1)) ? (~reg2_i + 1) : reg2_i;
+  assign opdata1_mult = (((aluop_i == `MULT) || (aluop_i == `MUL)) && (reg1_i[31] == 1'b1)) ? (~reg1_i + 1) : reg1_i;
+  assign opdata2_mult = (((aluop_i == `MULT) || (aluop_i == `MUL)) && (reg2_i[31] == 1'b1)) ? (~reg2_i + 1) : reg2_i;
   // assign hilo_temp = opdata1_mult * opdata2_mult;
   mul unit1(.ina(opdata1_mult), .inb(opdata2_mult), .out(hilo_temp));
 
@@ -318,10 +187,10 @@ module ex(
     else begin
       case (aluop_i)
         `MUL:begin
-          result_mul <= $signed(reg1_i) * $signed(reg2_i);
+          result_mul <= reg1_i[31] ^ reg2_i[31] ? (~hilo_temp + 1) : hilo_temp;
         end
         `MULT:begin
-          result_mul <= $signed(reg1_i) * $signed(reg2_i);
+          result_mul <= reg1_i[31] ^ reg2_i[31] ? (~hilo_temp + 1) : hilo_temp;
         end
         `MULTU:begin
           result_mul <= hilo_temp;
@@ -611,9 +480,6 @@ module ex(
   end // always
   
 // loadassert & storeassert
-  // assign aluop_o = aluop_i;
-  // assign mem_addr_o = reg1_i + {{16{inst_i[15]}},inst_i[15:0]};
-  // assign reg2_o = reg2_i;
   wire [`RegBus] mem_addr;
   assign mem_addr = reg1_i + {{16{inst_i[15]}},inst_i[15:0]};
   always @ (*) begin

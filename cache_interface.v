@@ -9,11 +9,11 @@ module cache_interface(
     output reg raccept, // accept
 
     output reg wen_fill, 
-    output reg [511:0] wfill,
+    output reg [255:0] wfill,
 
     input wire wen, // wen_back
     input wire [31:0] waddr, // waddr
-    input wire [511:0] wdata, // wback
+    input wire [255:0] wdata, // wback
     output reg wfin, // fin
 
 // control interface
@@ -26,7 +26,7 @@ module cache_interface(
 );
 
     reg [7:0] stage;
-    reg [511:0] cache_data_temp;
+    reg [255:0] cache_data_temp;
     reg [31:0] raddr_temp;
     reg [3:0] offset;
     always @ (posedge clk) begin
@@ -60,7 +60,7 @@ module cache_interface(
                     if (sram_rvalid) begin
                         cache_data_temp[offset*32+:32] <= sram_rdata;
                         offset <= offset + 1'b1;
-                        if (offset == 4'b1111) begin
+                        if (offset == 4'b0111) begin
                             stage <= stage << 1;
                         end
                         else begin
